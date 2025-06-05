@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EHR人資系統 APP 安裝教學</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        html { 
+            height: 100%;
+            overflow: hidden;
+        }
+        body {
+            font-family: 'Inter', 'Noto Sans TC', sans-serif;
+            overflow: hidden; 
+            height: 100%; 
+            margin: 0;
+            padding: 0;
+            background-color: #FFFFFF; 
+            background-image: url('background.png'); 
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed; 
+        }
+        .page-header {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; 
+            position: sticky; 
+            top: 0;
+            left: 0;
+            z-index: 1001; 
+            background-color: rgba(255,255,255,0.95); 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            height: 60px; 
+        }
+        .page-header img.logo-img { 
+            height: 36px; 
+            width: auto;
+        }
+        
+        .page {
+            width: 100%;
+            height: calc(100vh - 60px); 
+            display: none;
+            flex-direction: column;
+            justify-content: flex-start; 
+            align-items: center;
+            padding: 2rem; 
+            box-sizing: border-box;
+            overflow-y: auto; 
+        }
+        .page.active {
+            display: flex;
+        }
+
+        #page-0 {
+            /* Removed specific background-color to let body background show */
+            justify-content: center; 
+            align-items: center;   
+            text-align: center;
+        }
+        .intro-container {
+            max-width: 700px;
+            padding: 2.5rem; /* Increased padding */
+            background-color: rgba(255, 255, 255, 0.9); /* Slightly more opaque for readability over body bg */
+            border-radius: 0.75rem;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        .intro-container h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 0.5rem;
+        }
+        .intro-container .subtitle {
+            font-size: 1.5rem;
+            color: #5a8a1a; /* Darker shade of green for better contrast */
+            margin-bottom: 1.5rem;
+        }
+        .intro-container .description {
+            font-size: 1rem;
+            color: #374151;
+            margin-bottom: 2.5rem;
+            line-height: 1.6;
+        }
+        .intro-navigation-links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 1rem;
+        }
+        .nav-link-item {
+            background-color: rgba(116, 175, 33, 0.2); /* #74af21 with 20% opacity */
+            color: #333; /* Darker text for better contrast on light bg */
+            padding: 1.25rem 1.5rem;
+            border-radius: 0.5rem;
+            text-align: left;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            border: 1px solid rgba(116, 175, 33, 0.4); /* Border with slight opacity */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .nav-link-item:hover {
+            background-color: rgba(116, 175, 33, 0.3); /* Slightly more opaque on hover */
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .nav-link-item .icon {
+            font-size: 1.75rem;
+            margin-right: 1rem;
+            width: 30px; 
+            color: #74af21; /* Green icon color */
+        }
+        .nav-link-item div h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+            color: #1a4705; /* Darker green for heading */
+        }
+        .nav-link-item div p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            margin: 0.25rem 0 0 0;
+            color: #374151; /* Darker text for p */
+        }
+      
+
+        .step-page, #page-os-select {
+            color: #374151;
+        }
+        .step-card, .os-select-card {
+            background-color: rgba(255, 255, 255, 0.92); 
+            border: 1px solid #E5E7EB;
+            border-radius: 0.75rem;
+            padding: 2.5rem; 
+            width: 100%;
+            max-width: 960px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+            margin: 2rem auto; 
+            text-align: center; 
+            display: flex; 
+            flex-direction: column; 
+            /* justify-content: space-between; Removed to allow content to define height */
+        }
+        .step-card-content { 
+            flex-grow: 1; 
+        }
+
+        .step-card h2, .os-select-card h2 {
+            color: #74af21;
+            font-size: 2rem; 
+            font-weight: 600;
+            margin-bottom: 2rem; 
+            text-align: center;
+        }
+        .os-select-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            flex-wrap: wrap; 
+        }
+        .os-button { /* Also used for ending page buttons */
+            background-color: #74af21;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1.25rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            min-width: 150px;
+        }
+        .os-button:hover {
+            background-color: #5a8a1a;
+        }
+        .step-item {
+            display: flex;
+            align-items: baseline; 
+            margin-bottom: 1.75rem; 
+            padding-bottom: 1.75rem; 
+            border-bottom: 1px solid #F3F4F6;
+            text-align: left; 
+        }
+        .step-item:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+        .step-item .icon {
+            font-size: 1.75rem; 
+            color: #74af21;
+            margin-right: 1.25rem; 
+            flex-shrink: 0; 
+            width: 35px; 
+            text-align: center;
+        }
+        .step-item .text-content {
+             flex-grow: 1; 
+        }
+        .step-item .text-content-with-image { 
+            display: flex;
+            flex-direction: row; 
+            gap: 1.5rem;
+            align-items: center; 
+        }
+        .step-item .text-content-with-image .main-text {
+            flex: 1; 
+        }
+        .step-item .text-content-with-image .side-image-container {
+            flex-shrink: 0;
+            max-width: 320px; 
+            margin-left: 1.5rem; 
+        }
+        .step-item .text-content-with-image .side-image-container img {
+            max-width: 100%;
+            height: auto; 
+            max-height: 350px; 
+            object-fit: contain; 
+            border-radius: 0.5rem;
+            border: 1px solid #E5E7EB;
+        }
+
+
+        .step-item .text-content h4 {
+            font-size: 1.25rem; 
+            font-weight: 600; 
+            color: #1F2937;
+            margin-bottom: 0.375rem; 
+        }
+        .step-item .text-content p, .step-item .text-content ul { 
+            font-size: 1rem; 
+            color: #4B5563;
+            line-height: 1.7; 
+        }
+        .step-item .text-content .app-specific-blue { 
+            font-weight: 600;
+            color: #2563eb; 
+        }
+        .step-item .text-content .url-text, .step-item .text-content .important-input { 
+            font-family: 'Courier New', Courier, monospace;
+            color: #DC2626; 
+            font-weight: bold;
+            word-break: break-all;
+        }
+         .step-item .text-content .important-input { 
+            font-family: inherit; 
+         }
+
+        .step-item img.screenshot {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            border: 1px solid #E5E7EB;
+            display: block; 
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .image-animation-container, .clickable-image-container { 
+            position: relative; 
+            width: 100%;
+            min-height: 350px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 1rem;
+            overflow: hidden; 
+        }
+        .clickable-image-container {
+             margin-top: 0.5rem;
+             cursor: pointer; 
+        }
+        .image-click-prompt {
+            text-align: center;
+            color: #DC2626; 
+            font-weight: bold;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem; 
+        }
+        .image-animation-container.clock-in-animation { 
+            min-height: 280px; 
+            max-height: 400px; 
+        }
+        .animated-image, .clickable-image { 
+            position: absolute; 
+            max-width: 90%;   
+            max-height: 330px; 
+            height: auto;     
+            width: auto;      
+            opacity: 0;
+            transition: opacity 0.7s ease-in-out; 
+            border-radius: 0.5rem;
+            border: 1px solid #E5E7EB;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%); 
+        }
+         .animated-image.clock-in-image, .clickable-image.clock-in-image { 
+            max-height: 380px; 
+         }
+
+        .animated-image.visible, .clickable-image.visible {
+            opacity: 1;
+        }
+        .card-footer-actions { 
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            margin-top: 2rem; 
+            width: 100%;
+            padding-top: 1rem; 
+            border-top: 1px solid #E5E7EB; 
+        }
+        .return-button {
+            background-color: #6b7280; 
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: inline-flex; 
+            align-items: center;
+        }
+        .return-button:hover{
+            background-color: #4b5563;
+        }
+
+        #page-ending { 
+            /* background-image: none !important; Removed, will inherit body's or be white */
+            /* background-color: transparent; Removed, will use step-card like background */
+            display: flex;
+            justify-content: center; /* Center the card */
+            align-items: center; /* Center the card */
+        }
+        #page-ending .step-card { /* Apply step-card style to ending page content */
+            text-align: center;
+            max-width: 600px; /* Or desired width for ending card */
+        }
+        .ending-text { /* Replaced .ending-page-content-wrapper .ending-text */
+            font-size: 1.75rem; /* Adjusted size to fit card better */
+            color: #1F2937; /* Darker text for readability on white card */
+            font-weight: 600;
+            margin-bottom: 2rem; 
+            line-height: 1.6;
+        }
+        .ending-page-buttons { 
+            display: flex;
+            justify-content: center; /* Center buttons */
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+
+        /* Global Navigation Arrows & Home Button */
+        .global-nav-arrow {
+            position: fixed;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.5); 
+            color: black; 
+            border: 1px solid rgba(0,0,0,0.2);
+            border-radius: 50%;
+            width: 44px; 
+            height: 44px; 
+            font-size: 20px; 
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .global-nav-arrow i { 
+             color: #333333; 
+        }
+        .global-nav-arrow:hover {
+            background-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .global-nav-arrow:hover i { 
+             color: #000000;
+        }
+        .global-nav-arrow:disabled {
+            background-color: rgba(200, 200, 200, 0.3);
+            border-color: rgba(0,0,0,0.1);
+            cursor: not-allowed;
+        }
+        .global-nav-arrow:disabled i {
+            color: #aaa;
+        }
+        #globalPrevArrow {
+            left: 1rem; 
+        }
+        #globalNextArrow {
+            right: 1rem; 
+        }
+        .global-home-button-bottom-right { 
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem; 
+            background-color: #74af21;
+            color: white;
+            padding: 0.75rem 1.5rem; 
+            border: none;
+            border-radius: 0.5rem; 
+            font-size: 0.9rem; 
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: inline-flex; 
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000; 
+        }
+         .global-home-button-bottom-right:hover {
+            background-color: #5a8a1a;
+        }
+
+
+        .progress-indicator {
+            position: fixed;
+            bottom: 1.75rem; 
+            left: 1.5rem; 
+            color: #374151;
+            font-size: 0.875rem;
+            background-color: rgba(229, 231, 235, 0.8);
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            z-index: 999; 
+        }
+
+        @media print {
+            body { overflow: visible !important; background-color: #FFFFFF !important; background-image: none !important; }
+            html { overflow: visible !important; height: auto !important;} 
+            .page-header { position: static !important; text-align: center; margin-bottom: 1rem; background-color: transparent !important; box-shadow: none !important; justify-content: center;}
+            .page-header img { height: 30px !important; }
+            .page { min-height: auto !important; height: auto !important; display: block !important; box-shadow: none !important; padding: 1rem 0 !important; justify-content: flex-start !important; padding-top: 0 !important; overflow-y: visible !important;}
+            .page.active { display: block !important; } 
+            .page:not(.active) { display: none !important; }
+            #page-0, #page-ending { background-image: none !important; background-color: #FFFFFF !important; }
+            .intro-container { box-shadow: none !important; border: 1px solid #ccc; }
+            .nav-link-item { background-color: #e9e9e9 !important; color: #000 !important; box-shadow: none !important; border: 1px solid #ccc; }
+            .step-card, .os-select-card { box-shadow: none !important; border: 1px solid #ccc; padding: 1.5rem; max-width: 100% !important; background-color: #FFFFFF !important; margin: 1rem auto; } 
+            .step-card h2, .os-select-card h2, .step-item .icon { color: #000000 !important; }
+            .step-item .text-content h4, .step-item .text-content p { color: #000000 !important; }
+            .step-item img.screenshot, .animated-image, .clickable-image, .ending-page-content-wrapper img { max-width: 80% !important; margin-left: auto; margin-right: auto; display: block; opacity: 1 !important; position: static !important; transform: none !important; }
+            .animated-image.visible, .clickable-image.visible { display: block; } 
+            .animated-image:not(.visible), .clickable-image:not(.visible) { display: none; } 
+            .image-animation-container, .clickable-image-container { min-height: auto !important; cursor: default !important; }
+            .image-click-prompt { display: none !important; } 
+            .ending-page-content-wrapper { height: auto !important; position:relative; } 
+            .ending-text { position: static; transform: none; color: #000000 !important; text-shadow: none !important; background-color: transparent !important; margin-top:1rem; font-size: 1.5rem !important;}
+            .card-footer-actions, .global-nav-arrow, .global-home-button-bottom-right { display: none !important; } 
+            .progress-indicator { display: none !important; }
+            [style*="transform:"] { transform: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <img src="TF_TrendForce-TW.png" alt="TrendForce Logo 集邦科技" class="logo-img">
+         <div></div> 
+    </div>
+
+    <div id="page-0" class="page active">
+        <div class="intro-container">
+            <h1>EHR人資系統 APP 安裝教學</h1>
+            <p class="subtitle">刷卡出勤一機搞定</p>
+            <p class="description">本教學將引導同仁們完成APP的下載、安裝、登入及核心功能操作，得以更加輕鬆管理人事相關事務。請選擇您想學習的章節或從頭開始。</p>
+            <div class="intro-navigation-links">
+                <div class="nav-link-item" id="introLinkStartOver">
+                    <i class="fas fa-play-circle icon"></i>
+                    <div>
+                        <h3>從頭操作</h3>
+                        <p>依序學習所有步驟</p>
+                    </div>
+                </div>
+                <div class="nav-link-item" id="introLinkSection1">
+                    <i class="fas fa-mobile-alt icon"></i>
+                    <div>
+                        <h3>第一節：安裝</h3>
+                        <p>APP下載與設定</p>
+                    </div>
+                </div>
+                <div class="nav-link-item" id="introLinkSection2">
+                    <i class="fas fa-sign-in-alt icon"></i>
+                    <div>
+                        <h3>第二節：登入 & 功能</h3>
+                        <p>學習登入與主要功能</p>
+                    </div>
+                </div>
+                <div class="nav-link-item" id="introLinkSection3">
+                    <i class="fas fa-fingerprint icon"></i>
+                    <div>
+                        <h3>第三節：刷卡說明</h3>
+                        <p>了解如何使用刷卡</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="page-qr-scan" class="page step-page">
+        <div class="step-card">
+            <div class="step-card-content">
+                <h2>第一節：下載安裝 - 取得與掃描 QR Code (通用)</h2>
+                <div class="step-item">
+                    <div class="icon"><i class="fas fa-globe"></i></div>
+                    <div class="text-content">
+                        <h4>步驟 1: 瀏覽 EHRS 網頁</h4>
+                        <p>請員工先在網頁瀏覽器上開啟 <a href="https://tfportal.trendforce.com:50443/Ehrsnet/Account/Index" target="_blank" class="text-[#74af21] hover:underline">EHRS 系統網頁</a>。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="icon"><i class="fas fa-qrcode"></i></div>
+                    <div class="text-content">
+                        <h4>步驟 2: 取得 APP 的 QR Code</h4>
+                        <p>在 EHRS 網頁上找到並按下「取得 APP」的按鈕，網頁上將會顯示適用於 iOS 與 Android 系統的人資表單 APP QR Code。</p>
+                        <img src="Page1-Step2.png" alt="取得APP QR Code 示意圖" class="screenshot">
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="icon"><i class="fas fa-mobile-alt"></i></div> 
+                    <div class="text-content">
+                        <h4>步驟 3: 掃描 QR Code 並選擇系統</h4>
+                        <p>開啟您手機或平板的相機，掃描上方 QR Code。接著，請點選「下一頁」選擇您的手機作業系統以查看 spezifische 安裝指引。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-os-select" class="page">
+        <div class="os-select-card">
+            <div class="step-card-content">
+                <h2>請選擇您的手機作業系統</h2>
+                <p class="text-lg text-gray-600 mb-8">為了提供更精準的安裝指引，請告訴我們您的裝置類型。</p>
+                <div class="os-select-buttons">
+                    <button class="os-button" onclick="window.jumpToPageById('page-android-guide')"><i class="fab fa-android mr-2"></i> Android</button>
+                    <button class="os-button" onclick="window.jumpToPageById('page-ios-guide')"><i class="fab fa-apple mr-2"></i> iOS</button>
+                </div>
+                <p class="mt-8 text-sm text-gray-500">若您不確定，或想跳過此步驟，可點擊「上一頁」返回通用說明，或詢問IT部門。</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-android-guide" class="page step-page"> 
+        <div class="step-card">
+            <div class="step-card-content">
+                <h2>第一節：下載安裝 - Android 裝置設定</h2>
+                <div class="step-item">
+                    <div class="icon"><i class="fab fa-android"></i></div>
+                    <div class="text-content">
+                        <h4><strong class="text-xl text-black">步驟4: Android 安裝設定</strong></h4>
+                        <p>下載完APP後，您可能需要調整裝置的安全性設定，以允許來自未知來源的應用程式安裝：<br>
+                            1. 前往手機的「設定」&gt;「生物識別和安全性」&gt;「安裝未知應用程序」&gt;「將文中人資表單允許此來源」。<br>
+                        </p>
+                        <div class="image-click-prompt">(點擊圖片看下一步)</div>
+                        <div id="androidImageContainer" class="clickable-image-container">
+                            <img id="androidImage1" src="Page2-2.png" alt="Android 安裝設定示意圖1" class="clickable-image">
+                            <img id="androidImage2" src="Page2-3.png" alt="Android 安裝設定示意圖2" class="clickable-image">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer-actions"> 
+                <button class="return-button" onclick="window.jumpToPageById('page-os-select'); return false;">返回選擇頁面</button>
+                </div>
+        </div>
+    </div>
+
+    <div id="page-ios-guide" class="page step-page">
+        <div class="step-card">
+             <div class="step-card-content">
+                <h2>第一節：下載安裝 - iOS 裝置設定</h2>
+                <div class="step-item">
+                    <div class="icon"><i class="fab fa-apple"></i></div>
+                    <div class="text-content">
+                        <h4><strong class="text-xl text-black">步驟4: iOS 安裝設定</strong></h4>
+                        <p>下載完APP後，您需要前往手機的「設定」來信任該開發者以完成安裝：<br>
+                            1. 前往手機的「設定」&gt;「一般」&gt;「VPN 與裝置管理」(在較舊的iOS版本中可能顯示為「描述檔」或「描述檔與裝置管理」)。<br>
+                            2. 在「企業級 APP」或描述檔列表中找到「<span class="app-specific-blue">WINTON</span>」或相關的開發者名稱。<br>
+                            3. 點選該開發者名稱，然後點選「信任 “開發者名稱”」，再次確認「信任」。完成後即可開啟 APP。
+                        </p>
+                        <div class="image-click-prompt">(點擊圖片看下一步)</div>
+                        <div id="iosImageContainer" class="clickable-image-container">
+                            <img id="iosImage1" src="ios-install-1.png" alt="iOS 安裝設定示意圖1" class="clickable-image">
+                            <img id="iosImage2" src="ios-install-2.png" alt="iOS 安裝設定示意圖2" class="clickable-image">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer-actions">
+                 <button class="return-button" onclick="window.jumpToPageById('page-os-select'); return false;">返回選擇頁面</button>
+                 </div>
+        </div>
+    </div>
+
+    <div id="page-login" class="page step-page">
+        <div class="step-card">
+            <div class="step-card-content">
+                <h2>第二節：登入 APP</h2>
+                <div class="step-item">
+                    <div class="icon"><i class="fas fa-play-circle"></i></div>
+                    <div class="text-content-with-image">
+                        <div class="main-text">
+                            <h4><strong class="text-xl text-black">步驟 1: 執行 APP 與輸入資訊</strong></h4> 
+                            <p>安裝完成後，請點選手機桌面上的「<span class="app-specific-blue">文中人資表單</span>」APP 圖示以執行。進入登入畫面後，請依序輸入以下資訊：</p>
+                            <ul class="list-disc list-inside mt-2 ml-4 text-gray-700">
+                                <li><strong>網站主機：</strong> 請輸入 <span class="url-text">https://tfportal.trendforce.com:50443</span></li>
+                                <li><strong>帳號：</strong> <span class="important-input">您的員工「工號」</span></li>
+                                <li><strong>密碼：</strong> <span class="important-input">您的「身分證字號」</span></li>
+                            </ul>
+                        </div>
+                        <div class="side-image-container" style="align-self: center; max-width: 300px;"> 
+                            <img src="Login.png" alt="登入畫面示意圖" style="object-fit: contain; max-height: 320px; height:auto;"> 
+                        </div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="icon"><i class="fas fa-language"></i></div>
+                    <div class="text-content">
+                        <h4><strong class="text-xl text-black">步驟 2: 選擇語系</strong></h4>
+                        <p>您可以點選語系選項，選擇 APP 畫面的顯示語言（如：中文繁體、中文簡體、English）。</p>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="icon"><i class="fas fa-sign-in-alt"></i></div>
+                    <div class="text-content">
+                        <h4><strong class="text-xl text-black">步驟 3: 按下「登入」</strong></h4>
+                        <p>確認所有資訊輸入無誤後，請按下「登入」按鈕，即可進入APP主功能頁面。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="page-main-features" class="page step-page">
+        <div class="step-card">
+             <div class="step-card-content">
+                <h2>第二節：APP 主要功能</h2>
+                <div class="step-item">
+                    <div class="icon"><i class="fas fa-th-large"></i></div> 
+                    <div class="text-content-with-image">
+                        <div class="main-text">
+                            <h4><strong class="text-xl text-black">主功能區概覽</strong></h4>
+                            <p>成功登入並選擇企業後，您將看到APP的主要功能區。各項功能簡述如下：</p>
+                            <ul class="list-none mt-3 ml-0 space-y-3"> 
+                                <li class="flex items-start"><i class="fas fa-file-signature fa-fw mr-3 text-[#74af21] text-lg pt-1"></i><span><strong>表單簽核：</strong>主要供簽核主管使用，進行員工申請單據的線上簽核。申請人也可在此查詢自己提交表單的目前簽核狀態。</span></li>
+                                <li class="flex items-start"><i class="fas fa-map-marker-alt fa-fw mr-3 text-[#74af21] text-lg pt-1"></i><span><strong>刷卡：</strong>提供 GPS 定位打卡功能，方便記錄員工的實際出勤位置與時間。</span></li>
+                                <li class="flex items-start"><i class="fas fa-edit fa-fw mr-3 text-[#74af21] text-lg pt-1"></i><span><strong>電子簽核：</strong>員工可在此提交各類電子表單申請，例如「請假單」。</span></li>
+                                <li class="flex items-start"><i class="fas fa-calendar-alt fa-fw mr-3 text-[#74af21] text-lg pt-1"></i><span><strong>行事曆：</strong>查看個人或團隊的相關排程、會議或重要日期。</span></li>
+                                <li class="flex items-start"><i class="fas fa-user-clock fa-fw mr-3 text-[#74af21] text-lg pt-1"></i><span><strong>出勤查詢：</strong>查詢個人的「刷卡」記錄以及「請假」相關資料。</span></li>
+                                <li class="flex items-start"><i class="fas fa-wallet fa-fw mr-3 text-[#74af21] text-lg pt-1"></i><span><strong>薪資查詢：</strong>提供「薪資條查詢」功能，讓員工可以隨時查看自己的薪資明細。</span></li>
+                            </ul>
+                        </div>
+                        <div class="side-image-container" style="align-self: center;">
+                            <img src="mainpage.png" alt="APP主功能頁面示意圖">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="page-clock-in" class="page step-page">
+        <div class="step-card">
+            <div class="step-card-content">
+                <h2>第三節：刷卡功能</h2>
+                <div class="step-item">
+                    <div class="icon"><i class="fas fa-fingerprint"></i></div>
+                    <div class="text-content-with-image">
+                        <div class="main-text">
+                            <h4><strong class="text-xl text-black">步驟 1: 選擇「刷卡」功能並執行</strong></h4>
+                            <p>在 APP 主功能區中，點選「刷卡」圖示。系統可能會請求您的位置權限，請允許以確保定位準確。</p>
+                            <h4 class="mt-4"><strong class="text-xl text-black">步驟 2: 刷卡成功提示</strong></h4>
+                            <p>成功完成打卡操作後，APP 畫面通常會顯示「刷卡成功」或類似的提示訊息，並記錄下當前的時間與位置。</p>
+                            <h4 class="mt-4"><strong class="text-xl text-black">補充: 刷卡記錄查詢</strong></h4>
+                            <p>您可以透過「出勤查詢」功能來檢視您過往的打卡記錄，確認打卡時間與地點是否正確。</p>
+                        </div>
+                        <div id="clockInImageContainer" class="side-image-container image-animation-container clock-in-animation" style="min-height: 350px; max-height:480px; width: 320px; align-self:center;"> 
+                            <img id="clockInImage1" src="clockinnout-1.png" alt="刷卡示意圖1" class="animated-image clock-in-image" style="max-height: 450px;">
+                            <img id="clockInImage2" src="clockinnout-2.png" alt="刷卡成功示意圖2" class="animated-image clock-in-image" style="max-height: 450px;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="page-ending" class="page">
+         <div class="step-card"> <div class="ending-page-content-wrapper">
+                <p class="ending-text" style="color: #1F2937; text-shadow: none; font-size:1.8rem;">恭喜已完成APP安裝，後續可以開始使用囉!!!</p>
+                <div class="ending-page-buttons"> 
+                    <button class="os-button" onclick="window.jumpToPageById('page-0')"><i class="fas fa-home mr-2"></i> 回首頁</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <button id="globalPrevArrow" class="global-nav-arrow"><i class="fas fa-chevron-left"></i></button>
+     <button id="globalNextArrow" class="global-nav-arrow"><i class="fas fa-chevron-right"></i></button>
+     <button class="global-home-button-bottom-right" id="globalHomeBtn"><i class="fas fa-home mr-2"></i>回主選單</button>
+    
+    <div id="progressIndicator" class="progress-indicator"></div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM fully loaded and parsed. Initializing script v14_fix.');
+        const pages = document.querySelectorAll('.page');
+        let currentPageIndex = 0;
+        const totalPages = pages.length; 
+
+        const globalPrevArrow = document.getElementById('globalPrevArrow');
+        const globalNextArrow = document.getElementById('globalNextArrow');
+        const globalHomeButton = document.getElementById('globalHomeBtn');
+        const progressIndicator = document.getElementById('progressIndicator');
+        
+        window.jumpToPageById = function(pageId) { 
+            console.log('Attempting to jump to page:', pageId);
+            const pageIndex = Array.from(pages).findIndex(p => p.id === pageId);
+            if (pageIndex !== -1) {
+                currentPageIndex = pageIndex;
+                showPage(currentPageIndex);
+            } else {
+                console.error('Page with ID not found:', pageId);
+            }
+        }
+
+        window.nextPage = function() { 
+            console.log('nextPage called. Current Page ID:', pages[currentPageIndex] ? pages[currentPageIndex].id : 'N/A');
+            const currentPageId = pages[currentPageIndex] ? pages[currentPageIndex].id : null;
+            if (currentPageId === 'page-0') window.jumpToPageById('page-qr-scan'); 
+            else if (currentPageId === 'page-qr-scan') window.jumpToPageById('page-os-select'); 
+            else if (currentPageId === 'page-os-select') window.jumpToPageById('page-android-guide'); 
+            else if (currentPageId === 'page-android-guide') window.jumpToPageById('page-ios-guide');
+            else if (currentPageId === 'page-ios-guide') window.jumpToPageById('page-login'); 
+            else if (currentPageIndex < totalPages - 1) { 
+                currentPageIndex++;
+                showPage(currentPageIndex);
+            }
+        }
+
+        window.prevPage = function() { 
+            console.log('prevPage called. Current Page ID:', pages[currentPageIndex] ? pages[currentPageIndex].id : 'N/A');
+            const currentPageId = pages[currentPageIndex] ? pages[currentPageIndex].id : null;
+            if (currentPageId === 'page-ending') window.jumpToPageById('page-clock-in'); 
+            else if (currentPageId === 'page-ios-guide') window.jumpToPageById('page-android-guide');
+            else if (currentPageId === 'page-android-guide') window.jumpToPageById('page-os-select');
+            else if (currentPageId === 'page-os-select') window.jumpToPageById('page-qr-scan');
+            else if (currentPageId === 'page-qr-scan') window.jumpToPageById('page-0');
+            else if (currentPageIndex > 0) {
+                currentPageIndex--;
+                showPage(currentPageIndex);
+            }
+        }
+
+
+        function setupClickableSlideshow(containerId, imageIds) {
+            const container = document.getElementById(containerId);
+            if (!container) return { resetSlideshow: () => {} }; 
+            const images = imageIds.map(id => document.getElementById(id)).filter(Boolean);
+            if (images.length === 0) return { resetSlideshow: () => {} };
+            let currentImageIndex = 0;
+            function showImage(index) {
+                images.forEach((img, i) => img.classList.toggle('visible', i === index));
+            }
+            showImage(currentImageIndex); 
+            container.addEventListener('click', () => {
+                currentImageIndex = (currentImageIndex + 1) % images.length;
+                showImage(currentImageIndex);
+            });
+            return { resetSlideshow: () => { currentImageIndex = 0; showImage(currentImageIndex); }};
+        }
+        
+        function setupAutomaticSlideshow(containerId, imageElements, durations) {
+            if (!containerId || !imageElements || imageElements.length === 0 || imageElements.filter(Boolean).length !== imageElements.length || imageElements.length !== durations.length) {
+                return { start: () => {}, stop: () => {} }; 
+            }
+            const container = document.getElementById(containerId);
+             if (!container) return { start: () => {}, stop: () => {} };
+            let currentImageIndex = 0;
+            let slideshowTimer = null;
+            function nextImageCorrected() {
+                imageElements.forEach(img => { if(img) img.classList.remove('visible'); });
+                if(imageElements[currentImageIndex]) imageElements[currentImageIndex].classList.add('visible');
+                const currentDuration = durations[currentImageIndex];
+                currentImageIndex = (currentImageIndex + 1) % imageElements.length; 
+                slideshowTimer = setTimeout(nextImageCorrected, currentDuration);
+            }
+            function start() {
+                stop(); currentImageIndex = 0; 
+                if (imageElements.some(el => el) && imageElements.length > 0) nextImageCorrected();
+            }
+            function stop() {
+                if (slideshowTimer) clearTimeout(slideshowTimer);
+                slideshowTimer = null;
+                imageElements.forEach(img => { if(img) img.classList.remove('visible'); }); 
+            }
+            return { start, stop };
+        }
+
+        const androidSlideshow = setupClickableSlideshow('androidImageContainer', ['androidImage1', 'androidImage2']);
+        const iosSlideshow = setupClickableSlideshow('iosImageContainer', ['iosImage1', 'iosImage2']);
+        const clockInSlideshow = setupAutomaticSlideshow(
+            'clockInImageContainer', 
+            [document.getElementById('clockInImage1'), document.getElementById('clockInImage2')],
+            [5000, 2000] 
+        );
+
+        function showPage(index) {
+            if(androidSlideshow && typeof androidSlideshow.resetSlideshow === 'function') androidSlideshow.resetSlideshow();
+            if(iosSlideshow && typeof iosSlideshow.resetSlideshow === 'function') iosSlideshow.resetSlideshow();
+            if(clockInSlideshow && typeof clockInSlideshow.stop === 'function') clockInSlideshow.stop();
+
+            pages.forEach((page, i) => page.classList.toggle('active', i === index));
+            
+            const activePageId = pages[index] ? pages[index].id : null;
+            if (activePageId === 'page-android-guide' && androidSlideshow && typeof androidSlideshow.resetSlideshow === 'function') androidSlideshow.resetSlideshow(); 
+            else if (activePageId === 'page-ios-guide' && iosSlideshow && typeof iosSlideshow.resetSlideshow === 'function') iosSlideshow.resetSlideshow();
+            else if (activePageId === 'page-clock-in' && clockInSlideshow && typeof clockInSlideshow.start === 'function') clockInSlideshow.start();
+
+            updateNavButtons(); 
+            updateProgressIndicator();
+            document.body.scrollTop = 0; 
+            document.documentElement.scrollTop = 0; 
+        }
+        
+        function updateNavButtons() {
+            const isFirstPage = currentPageIndex === 0;
+            const isLastPage = currentPageIndex === totalPages - 1 && pages[currentPageIndex].id === 'page-ending';
+
+            if (globalPrevArrow) {
+                globalPrevArrow.disabled = isFirstPage;
+                globalPrevArrow.style.display = (isFirstPage || isLastPage) ? 'none' : 'flex';
+            }
+            if (globalNextArrow) {
+                globalNextArrow.disabled = isLastPage;
+                globalNextArrow.style.display = isLastPage ? 'none' : 'flex';
+            }
+            if (globalHomeButton) { 
+                globalHomeButton.style.display = (isFirstPage || isLastPage) ? 'none' : 'flex';
+            }
+            
+            // Hide specific ending page buttons if global nav is active there
+            const endingPrevBtn = document.getElementById('endingPrevBtn');
+            const endingHomeBtn = document.querySelector('#page-ending .os-button[onclick*="page-0"]');
+            if (isLastPage) {
+                if (endingPrevBtn) endingPrevBtn.style.display = 'inline-flex';
+                if (endingHomeBtn) endingHomeBtn.style.display = 'inline-flex';
+            } else {
+                 if (endingPrevBtn) endingPrevBtn.style.display = 'none';
+                 if (endingHomeBtn) endingHomeBtn.style.display = 'none';
+            }
+
+
+            if (progressIndicator) {
+                 progressIndicator.style.display = (isFirstPage || isLastPage) ? 'none' : 'block';
+                 if(isFirstPage && pages[currentPageIndex] && pages[currentPageIndex].id === 'page-0') {
+                     progressIndicator.textContent = '首頁'; 
+                 }
+            }
+        }
+        
+        function updateProgressIndicator() {
+            if (progressIndicator) {
+                const currentPageId = pages[currentPageIndex] ? pages[currentPageIndex].id : null;
+                if (currentPageId === 'page-ending' || currentPageId === 'page-0') { 
+                    progressIndicator.style.display = 'none'; 
+                } else {
+                    const conceptualStepsMap = {
+                        'page-qr-scan': 1,
+                        'page-os-select': 2,
+                        'page-android-guide': 3,
+                        'page-ios-guide': 3, 
+                        'page-login': 4,
+                        'page-main-features': 5,
+                        'page-clock-in': 6
+                    };
+                    const totalConceptualSteps = 6; 
+                    const currentConceptualStepNumber = conceptualStepsMap[currentPageId];
+                    if (currentConceptualStepNumber) {
+                        progressIndicator.textContent = `步驟 ${currentConceptualStepNumber} / ${totalConceptualSteps}`;
+                        progressIndicator.style.display = 'block';
+                    } else {
+                         progressIndicator.style.display = 'none'; 
+                    }
+                }
+            }
+        }
+        
+        const introLinkStartOver = document.getElementById('introLinkStartOver');
+        const introLinkSection1 = document.getElementById('introLinkSection1');
+        const introLinkSection2 = document.getElementById('introLinkSection2');
+        const introLinkSection3 = document.getElementById('introLinkSection3');
+
+        if (introLinkStartOver) introLinkStartOver.addEventListener('click', () => window.jumpToPageById('page-qr-scan'));
+        if (introLinkSection1) introLinkSection1.addEventListener('click', () => window.jumpToPageById('page-qr-scan'));
+        if (introLinkSection2) introLinkSection2.addEventListener('click', () => window.jumpToPageById('page-login'));
+        if (introLinkSection3) introLinkSection3.addEventListener('click', () => window.jumpToPageById('page-clock-in'));
+        
+        // Bind global navigation arrows and home button
+        if(globalPrevArrow) globalPrevArrow.addEventListener('click', window.prevPage);
+        if(globalNextArrow) globalNextArrow.addEventListener('click', window.nextPage);
+        if(globalHomeButton) globalHomeButton.addEventListener('click', () => window.jumpToPageById('page-0'));
+        
+        // Bind ending page previous button (if its ID is 'endingPrevBtn')
+        const endingPrevBtnElem = document.getElementById('endingPrevBtn');
+        if(endingPrevBtnElem) endingPrevBtnElem.addEventListener('click', window.prevPage);
+
+
+        showPage(currentPageIndex);
+        console.log('Script loaded and initialized.');
+    });
+    </script>
+</body>
+</html>
